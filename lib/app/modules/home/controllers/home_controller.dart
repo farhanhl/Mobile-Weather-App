@@ -4,6 +4,7 @@ import 'package:flutter_easyloading/flutter_easyloading.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:get/get.dart';
+import 'package:weather_app/app/core/widget/dialog.dart';
 import 'package:weather_app/app/modules/home/models/quotes_model.dart';
 import '../../../core/app_colors.dart';
 import '../models/weather_model.dart';
@@ -163,7 +164,11 @@ class HomeController extends GetxController {
       }).catchError(
         (e) {
           finishSubmit();
-          log("$e");
+          final statusCode = getStatusCode("$e");
+          CustomDialog.defaultDialog(
+            statusCode: statusCode,
+            message404: "City not found",
+          );
         },
       );
     }
@@ -188,6 +193,21 @@ class HomeController extends GetxController {
 
   String capitalizeFirstLetter(String word) {
     return word[0].toUpperCase() + word.substring(1);
+  }
+
+  int getStatusCode(String exception) {
+    RegExp regex = RegExp(r'\[(\d+)\]');
+    Match? match = regex.firstMatch(exception);
+    String? errorStatusCode;
+    int statusCode = 0;
+
+    if (match != null) {
+      errorStatusCode = match.group(1)!;
+      statusCode = int.parse(errorStatusCode);
+      return statusCode;
+    } else {
+      return statusCode;
+    }
   }
 
   // @override
